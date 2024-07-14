@@ -28,7 +28,7 @@ DJANGO_APPS = [
     'django.contrib.staticfiles',
 ]
 
-PROJECT_APPS = []
+PROJECT_APPS = ["apps.user"]
 ECOMMERCE_APPS = []
 THIRD_PARTY_APPS = [
     'corsheaders',
@@ -86,10 +86,20 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 
 
+# Importar env para acceder a las variables de entorno
 
+# Configuración de la base de datos
 DATABASES = {
-    "default": env.db("DATABASE_URL", default="postgres:///root"), 
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',  # Usar el backend de MySQL
+        'NAME': env.str('DATABASE_NAME', 'ejemplo1'),  # Nombre de la base de datos
+        'USER': env.str('DATABASE_USER', 'root'),     # Usuario de la base de datos
+        'PASSWORD': env.str('DATABASE_PASSWORD', '25162516'),  # Contraseña de la base de datos
+        'HOST': env.str('DATABASE_HOST', '127.0.0.1'),   # Host de la base de datos
+        'PORT': env.int('DATABASE_PORT', 3306),          # Puerto de la base de datos
+    }
 }
+
 
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
 
@@ -174,6 +184,32 @@ SIMPLE_JWT = {
         'rest_framework_simplejwt.tokens.AccessToken',
     )
 }
+
+DJOSER = {
+    'LOGIN_FIELD': 'email',
+    'USER_CREATE_PASSWORD_RETYPE': True,
+    'USERNAME_CHANGED_EMAIL_CONFIRMATION': True,
+    'PASSWORD_CHANGED_EMAIL_CONFIRMATION': True,
+    'SEND_CONFIRMATION_EMAIL': True,
+    'SET_USERNAME_RETYPE': True,
+    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'SET_PASSWORD_RETYPE': True,
+    'PASSWORD_RESET_CONFIRM_RETYPE': True,
+    'USERNAME_RESET_CONFIRM_URL': 'email/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': 'activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,
+    'SOCIAL_AUTH_TOKEN_STRATEGY': 'djoser.social.token.jwt.TokenStrategy',
+    'SOCIAL_AUTH_ALLOWED_REDIRECT_URIS': ['http://localhost:8000/google', 'http://localhost:8000/facebook'],
+    'SERIALIZERS': {
+        'user_create': 'apps.user.serializers.UserCreateSerializer',
+        'user': 'apps.user.serializers.UserCreateSerializer',
+        'current_user': 'apps.user.serializers.UserCreateSerializer',
+        'user_delete': 'djoser.serializers.UserDeleteSerializer',
+    },
+}
+
+
+AUTH_USER_MODEL = "user.UserAccount"
 
 EMAIL_BACKEND='django.core.mail.backends.console.EmailBackend'
 
